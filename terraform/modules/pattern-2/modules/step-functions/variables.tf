@@ -37,6 +37,16 @@ variable "process_results_function_arn" {
   type        = string
 }
 
+variable "assessment_function_arn" {
+  description = "ARN of the Assessment Lambda function"
+  type        = string
+}
+
+variable "summarization_function_arn" {
+  description = "ARN of the Summarization Lambda function"
+  type        = string
+}
+
 # Security
 variable "customer_managed_key_arn" {
   description = "KMS key ARN"

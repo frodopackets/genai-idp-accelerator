@@ -46,6 +46,10 @@ module "lambda_functions" {
   common_env_vars         = local.common_lambda_env_vars
   bedrock_env_vars        = local.bedrock_env_vars
   
+  # Feature Flags
+  is_assessment_enabled   = var.is_assessment_enabled
+  is_summarization_enabled = var.is_summarization_enabled
+  
   # AppSync Integration
   appsync_api_arn         = var.appsync_api_arn
   
@@ -66,6 +70,8 @@ module "step_functions" {
   ocr_function_arn         = module.lambda_functions.function_arns["ocr"]
   classification_function_arn = module.lambda_functions.function_arns["classification"]
   extraction_function_arn  = module.lambda_functions.function_arns["extraction"]
+  assessment_function_arn = module.lambda_functions.function_arns["assessment"]
+  summarization_function_arn = module.lambda_functions.function_arns["summarization"]
   process_results_function_arn = module.lambda_functions.function_arns["process_results"]
   
   # Security

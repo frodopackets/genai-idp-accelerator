@@ -130,6 +130,19 @@ variable "appsync_api_arn" {
   default     = ""
 }
 
+# Feature Flags
+variable "is_assessment_enabled" {
+  description = "Enable extraction confidence assessment functionality"
+  type        = bool
+  default     = false
+}
+
+variable "is_summarization_enabled" {
+  description = "Enable document summarization functionality"
+  type        = bool
+  default     = true
+}
+
 # Tags
 variable "tags" {
   description = "Tags to apply to resources"

@@ -10,6 +10,8 @@ locals {
     ocr             = "${local.resource_prefix}-ocr"
     classification  = "${local.resource_prefix}-classification"
     extraction      = "${local.resource_prefix}-extraction"
+    assessment      = "${local.resource_prefix}-assessment"
+    summarization   = "${local.resource_prefix}-summarization"
     process_results = "${local.resource_prefix}-process-results"
   }
   

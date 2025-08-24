@@ -7,6 +7,8 @@ output "function_arns" {
     ocr             = aws_lambda_function.ocr.arn
     classification  = aws_lambda_function.classification.arn
     extraction      = aws_lambda_function.extraction.arn
+    assessment      = aws_lambda_function.assessment.arn
+    summarization   = aws_lambda_function.summarization.arn
     process_results = aws_lambda_function.process_results.arn
   }
 }
@@ -17,6 +19,8 @@ output "function_names" {
     ocr             = aws_lambda_function.ocr.function_name
     classification  = aws_lambda_function.classification.function_name
     extraction      = aws_lambda_function.extraction.function_name
+    assessment      = aws_lambda_function.assessment.function_name
+    summarization   = aws_lambda_function.summarization.function_name
     process_results = aws_lambda_function.process_results.function_name
   }
 }
@@ -27,6 +31,8 @@ output "function_role_arns" {
     ocr             = aws_iam_role.ocr.arn
     classification  = aws_iam_role.classification.arn
     extraction      = aws_iam_role.extraction.arn
+    assessment      = aws_iam_role.assessment.arn
+    summarization   = aws_iam_role.summarization.arn
     process_results = aws_iam_role.process_results.arn
   }
 }

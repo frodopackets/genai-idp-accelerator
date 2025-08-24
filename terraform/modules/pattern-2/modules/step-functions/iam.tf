@@ -61,6 +61,8 @@ data "aws_iam_policy_document" "state_machine" {
       var.ocr_function_arn,
       var.classification_function_arn,
       var.extraction_function_arn,
+      var.assessment_function_arn,
+      var.summarization_function_arn,
       var.process_results_function_arn
     ]
   }

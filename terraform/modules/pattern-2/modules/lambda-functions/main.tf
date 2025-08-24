@@ -193,6 +193,116 @@ resource "aws_lambda_function" "extraction" {
 }
 
 # ----------------------------------------
+# Assessment Lambda Function
+# ----------------------------------------
+resource "aws_lambda_function" "assessment" {
+  filename         = "${path.module}/functions/assessment/deployment.zip"
+  function_name    = var.lambda_function_names["assessment"]
+  role            = aws_iam_role.assessment.arn
+  handler         = "lambda_function.lambda_handler"
+  runtime         = var.lambda_runtime
+  timeout         = var.lambda_timeout
+  memory_size     = var.lambda_memory_size
+  reserved_concurrent_executions = var.lambda_reserved_concurrent_executions
+  code_signing_config_arn = var.code_signing_config_arn != "" ? var.code_signing_config_arn : null
+  
+  layers = [aws_lambda_layer_version.pattern2_dependencies.arn]
+  
+  environment {
+    variables = merge(
+      var.common_env_vars,
+      var.bedrock_env_vars,
+      {
+        FUNCTION_TYPE = "ASSESSMENT"
+        IS_ASSESSMENT_ENABLED = var.is_assessment_enabled
+      }
+    )
+  }
+  
+  kms_key_arn = var.customer_managed_key_arn
+  
+  dead_letter_config {
+    target_arn = aws_sqs_queue.dlq.arn
+  }
+  
+  # VPC Configuration (optional but recommended for security)
+  dynamic "vpc_config" {
+    for_each = var.lambda_vpc_config != null ? [var.lambda_vpc_config] : []
+    content {
+      subnet_ids         = vpc_config.value.subnet_ids
+      security_group_ids = vpc_config.value.security_group_ids
+    }
+  }
+
+  tracing_config {
+    mode = "Active"
+  }
+  
+  tags = merge(
+    var.tags,
+    {
+      Name         = var.lambda_function_names["assessment"]
+      FunctionType = "Assessment"
+    }
+  )
+}
+
+# ----------------------------------------
+# Summarization Lambda Function
+# ----------------------------------------
+resource "aws_lambda_function" "summarization" {
+  filename         = "${path.module}/functions/summarization/deployment.zip"
+  function_name    = var.lambda_function_names["summarization"]
+  role            = aws_iam_role.summarization.arn
+  handler         = "lambda_function.lambda_handler"
+  runtime         = var.lambda_runtime
+  timeout         = var.lambda_timeout
+  memory_size     = var.lambda_memory_size
+  reserved_concurrent_executions = var.lambda_reserved_concurrent_executions
+  code_signing_config_arn = var.code_signing_config_arn != "" ? var.code_signing_config_arn : null
+  
+  layers = [aws_lambda_layer_version.pattern2_dependencies.arn]
+  
+  environment {
+    variables = merge(
+      var.common_env_vars,
+      var.bedrock_env_vars,
+      {
+        FUNCTION_TYPE = "SUMMARIZATION"
+        IS_SUMMARIZATION_ENABLED = var.is_summarization_enabled
+      }
+    )
+  }
+  
+  kms_key_arn = var.customer_managed_key_arn
+  
+  dead_letter_config {
+    target_arn = aws_sqs_queue.dlq.arn
+  }
+  
+  # VPC Configuration (optional but recommended for security)
+  dynamic "vpc_config" {
+    for_each = var.lambda_vpc_config != null ? [var.lambda_vpc_config] : []
+    content {
+      subnet_ids         = vpc_config.value.subnet_ids
+      security_group_ids = vpc_config.value.security_group_ids
+    }
+  }
+
+  tracing_config {
+    mode = "Active"
+  }
+  
+  tags = merge(
+    var.tags,
+    {
+      Name         = var.lambda_function_names["summarization"]
+      FunctionType = "Summarization"
+    }
+  )
+}
+
+# ----------------------------------------
 # Process Results Lambda Function
 # ----------------------------------------
 resource "aws_lambda_function" "process_results" {
