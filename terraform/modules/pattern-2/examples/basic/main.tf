@@ -65,7 +65,8 @@ resource "aws_kms_key" "idp" {
             "dynamodb.amazonaws.com",
             "logs.amazonaws.com",
             "sns.amazonaws.com",
-            "sqs.amazonaws.com"
+            "sqs.amazonaws.com",
+            "cloudfront.amazonaws.com"
           ]
         }
         Action = [
@@ -76,6 +77,26 @@ resource "aws_kms_key" "idp" {
           "kms:DescribeKey"
         ]
         Resource = "*"
+      },
+      {
+        Sid    = "Allow CloudFront to access S3 objects"
+        Effect = "Allow"
+        Principal = {
+          AWS = "*"
+        }
+        Action = [
+          "kms:Decrypt",
+          "kms:GenerateDataKey*"
+        ]
+        Resource = "*"
+        Condition = {
+          StringEquals = {
+            "kms:ViaService" = "s3.${data.aws_region.current.name}.amazonaws.com"
+          }
+          StringLike = {
+            "kms:EncryptionContext:aws:s3:arn" = "arn:aws:s3:::${var.stack_name}-pattern2-web-ui-${data.aws_caller_identity.current.account_id}/*"
+          }
+        }
       }
     ]
   })
