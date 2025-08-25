@@ -224,32 +224,99 @@ Pattern 2 supports the following configuration options:
 
 See `terraform/modules/pattern-2/locals.tf` for the complete schema definition.
 
-### UI Deployment Process
+### Complete Deployment Process
 
-After Terraform deployment:
+#### 1. Infrastructure Deployment (Terraform)
 
-1. **Infrastructure Ready**: Backend services and UI infrastructure are deployed
-2. **React Application**: Build the React app from `/src/ui/` directory
-3. **Configuration**: Use Terraform outputs to configure the React app
-4. **Deploy**: Upload built assets to the S3 web UI bucket
-5. **Access**: Navigate to the CloudFront URL to use the application
-
-**Example Configuration Commands:**
 ```bash
-# Get UI configuration from Terraform outputs
-terraform output ui_configuration
+cd terraform/modules/pattern-2/examples/basic
+terraform init
+terraform plan
+terraform apply
+```
 
-# Build and deploy React application
-cd /src/ui
-npm install
-npm run build
+#### 2. Post-Deployment Configuration
 
-# Deploy to S3 (replace with actual bucket name from outputs)
-aws s3 sync build/ s3://your-web-ui-bucket-name/
+**CRITICAL STEP**: The React application requires additional configuration after Terraform deployment:
 
-# Invalidate CloudFront cache
+```bash
+# Run the automated post-deployment configuration script
+cd terraform/modules/pattern-2/scripts
+./post-deploy-config.sh \
+  --account-id $(aws sts get-caller-identity --query Account --output text) \
+  --region us-east-1 \
+  --stack-prefix idp-pattern2-example
+```
+
+This script:
+- Creates the AWS Systems Manager Parameter Store parameter for app settings
+- Adds SSM read permissions to the Cognito authenticated user role
+- Generates environment file template for the React app
+
+#### 3. React Application Configuration
+
+Update `src/ui/.env.production` with Terraform outputs:
+
+```bash
+# Production environment variables (replace with actual values)
+REACT_APP_AWS_REGION=us-east-1
+REACT_APP_USER_POOL_ID=us-east-1_XXXXXXXXX
+REACT_APP_USER_POOL_CLIENT_ID=XXXXXXXXXXXXXXXXXXXXXXXXXX
+REACT_APP_IDENTITY_POOL_ID=us-east-1:XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+REACT_APP_APPSYNC_GRAPHQL_URL=https://XXXXXXXXXXXXXXXXXXXXXXXXXX.appsync-api.us-east-1.amazonaws.com/graphql
+REACT_APP_INPUT_BUCKET=idp-pattern2-example-pattern2-input-XXXXXXXXXXXX
+REACT_APP_OUTPUT_BUCKET=idp-pattern2-example-pattern2-output-XXXXXXXXXXXX
+REACT_APP_WORKING_BUCKET=idp-pattern2-example-pattern2-working-XXXXXXXXXXXX
+REACT_APP_SETTINGS_PARAMETER=/idp-pattern2-example/settings
+```
+
+#### 4. Build and Deploy React Application
+
+**Use the optimized build script** to avoid memory and performance issues:
+
+```bash
+cd src/ui
+./scripts/build-optimized.sh
+```
+
+Or manually with optimization flags:
+```bash
+GENERATE_SOURCEMAP=false INLINE_RUNTIME_CHUNK=false NODE_OPTIONS="--max-old-space-size=4096" npm run build
+```
+
+Deploy to S3:
+```bash
+aws s3 sync build/ s3://YOUR_WEB_UI_BUCKET_NAME --delete --region us-east-1
+```
+
+#### 5. CloudFront Cache Invalidation
+
+After deployment, clear the CloudFront cache:
+```bash
 aws cloudfront create-invalidation --distribution-id YOUR_DISTRIBUTION_ID --paths "/*"
 ```
+
+### 🚨 Critical Deployment Requirements
+
+#### Parameter Store Integration
+The React application **requires** AWS Systems Manager Parameter Store configuration:
+
+- **Parameter Name**: `/idp-pattern2-example/settings` (configurable via stack prefix)
+- **Parameter Value**: JSON object containing `InputBucket`, `OutputBucket`, `WorkingBucket`, and app metadata
+- **IAM Permissions**: Cognito authenticated users must have `ssm:GetParameter` permission
+
+#### React Build Optimization
+Standard `npm run build` may hang due to memory issues. **Always use**:
+- `GENERATE_SOURCEMAP=false` - Reduces build size and time
+- `INLINE_RUNTIME_CHUNK=false` - Prevents inlining issues  
+- `NODE_OPTIONS="--max-old-space-size=4096"` - Increases memory limit
+
+#### Content Security Policy (CSP)
+The updated Terraform module includes React-friendly CSP headers:
+- Allows `data:` and `blob:` sources for dynamic content
+- Permits `unsafe-inline` styles for React
+- Includes Cognito endpoints in `connect-src`
+- Uses standard `Content-Security-Policy` header (not `X-Content-Security-Policy`)
 
 ## Working with Claude Code
 
@@ -269,13 +336,72 @@ When making changes to the Terraform module:
 - Include comprehensive documentation in README.md files
 - Provide working examples for different use cases
 
+#### New Deployment Assets
+
+The following files have been added to simplify deployment and troubleshooting:
+
+**📋 Terraform Module Files:**
+- `terraform/modules/pattern-2/scripts/post-deploy-config.sh` - Post-deployment configuration automation
+- `terraform/modules/pattern-2/DEPLOYMENT.md` - Comprehensive deployment guide with troubleshooting
+
+**⚡ React Build Optimization:**
+- `src/ui/scripts/build-optimized.sh` - Optimized React build script with memory management
+
+**🔧 Module Improvements:**
+- Updated `modules/cognito/main.tf` - Added Parameter Store IAM permissions
+- Updated `modules/web-hosting/main.tf` - React-friendly CSP configuration
+- Enhanced security headers and CORS policies
+
+### Common Deployment Issues and Solutions
+
+#### Issue: React Build Hangs or Fails
+**Symptoms**: Build process hangs at "Creating an optimized production build..." or memory errors
+
+**Solutions**:
+1. Use the optimized build script: `./scripts/build-optimized.sh`
+2. Clear npm cache: `npm cache clean --force`
+3. Delete and reinstall: `rm -rf node_modules package-lock.json && npm install`
+
+#### Issue: "Input bucket not configured" Error
+**Symptoms**: React app shows error about missing input bucket configuration
+
+**Root Cause**: Missing Parameter Store configuration or IAM permissions
+
+**Solutions**:
+1. Run post-deployment script: `./post-deploy-config.sh`
+2. Verify Parameter Store parameter exists: `aws ssm get-parameter --name "/idp-pattern2-example/settings"`
+3. Check Cognito IAM role has SSM permissions
+
+#### Issue: Blank White Page  
+**Symptoms**: CloudFront URL shows blank page, CSP errors in browser console
+
+**Root Cause**: Overly restrictive Content Security Policy headers
+
+**Solution**: Use updated Terraform module with React-friendly CSP configuration, then create CloudFront invalidation
+
+#### Issue: Authentication Errors
+**Symptoms**: Cannot log in, "User does not exist" errors
+
+**Solutions**:
+1. Create admin user: `aws cognito-idp admin-create-user --user-pool-id YOUR_POOL_ID --username email@example.com`
+2. Set permanent password: `aws cognito-idp admin-set-user-password --user-pool-id YOUR_POOL_ID --username email@example.com --password SecurePassword123! --permanent`
+
+#### Issue: CloudFront/KMS Encryption Conflicts
+**Symptoms**: CloudFront 403 errors, "UnrecognizedClientException" from KMS
+
+**Root Cause**: CloudFront cannot decrypt KMS-encrypted S3 objects for static hosting
+
+**Solution**: Use AES256 encryption for web UI bucket (configured in updated module): `customer_managed_key_arn = null`
+
 ### Security Considerations
 
-- All resources use customer-managed KMS keys
+- All resources use customer-managed KMS keys (except web UI bucket for CloudFront compatibility)
 - IAM roles follow least privilege principles
 - Support for organizational compliance (permissions boundaries)
 - CloudWatch logging enabled for all components
 - Dead letter queues for error handling
+- React-friendly Content Security Policy headers
+- Parameter Store integration for secure configuration management
 
 ### Monitoring
 

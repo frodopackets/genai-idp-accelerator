@@ -142,13 +142,16 @@ resource "aws_cloudfront_response_headers_policy" "security_headers" {
       referrer_policy = "strict-origin-when-cross-origin"
       override        = true
     }
-  }
-  
-  custom_headers_config {
-    items {
-      header   = "X-Content-Security-Policy"
-      value    = "default-src 'self' data: https://*.amazonaws.com https://*.amplifyapp.com; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://*.amazonaws.com wss://*.amazonaws.com"
-      override = true
+    
+    xss_protection {
+      mode_block = true
+      protection = true
+      override   = true
+    }
+    
+    content_security_policy {
+      content_security_policy = "default-src 'self' data: blob: https://*.amazonaws.com https://*.amplifyapp.com; script-src 'self' 'unsafe-inline' 'unsafe-eval' data:; style-src 'self' 'unsafe-inline' data:; img-src 'self' data: blob: https:; connect-src 'self' https://*.amazonaws.com wss://*.amazonaws.com https://cognito-idp.${data.aws_region.current.name}.amazonaws.com; font-src 'self' data:; object-src 'none';"
+      override               = true
     }
   }
 }

@@ -295,7 +295,7 @@ resource "aws_iam_role_policy" "cognito_authenticated_policy" {
   
   policy = jsonencode({
     Version = "2012-10-17"
-    Statement = [
+    Statement = concat([
       {
         Effect = "Allow"
         Action = [
@@ -321,7 +321,15 @@ resource "aws_iam_role_policy" "cognito_authenticated_policy" {
           for bucket in var.s3_bucket_arns : "${bucket}/*"
         ]
       }
-    ]
+    ], var.parameter_store_arn != null ? [
+      {
+        Effect = "Allow"
+        Action = [
+          "ssm:GetParameter"
+        ]
+        Resource = [var.parameter_store_arn]
+      }
+    ] : [])
   })
 }
 

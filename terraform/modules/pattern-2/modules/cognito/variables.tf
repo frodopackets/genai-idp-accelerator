@@ -140,6 +140,12 @@ variable "s3_bucket_arns" {
   default     = []
 }
 
+variable "parameter_store_arn" {
+  description = "Parameter Store parameter ARN for application settings"
+  type        = string
+  default     = null
+}
+
 variable "admin_user_email" {
   description = "Admin user email address (optional)"
   type        = string
