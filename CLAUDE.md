@@ -321,6 +321,17 @@ The complete Pattern 2 application is now operational:
 - Interactive results visualization
 - Configuration management interface
 
+### 🔒 Security & KMS Configuration
+
+**Important**: The KMS key policy has been configured to allow CloudFront access to encrypted S3 objects. This includes:
+
+- **CloudFront Service Access**: Added `cloudfront.amazonaws.com` to allowed services
+- **Conditional Decryption**: CloudFront can only decrypt objects via S3 service in us-east-1
+- **Resource-Specific Access**: Limited to web UI bucket objects using S3 ARN patterns
+- **Secure by Design**: Maintains encryption while enabling proper CDN functionality
+
+This resolves the `KMS.UnrecognizedClientException` error that can occur when CloudFront tries to serve encrypted S3 content.
+
 ### 📋 Optional Enhancements
 - **WAF Integration**: API security and rate limiting (module exists but not integrated)
 - **CodeBuild CI/CD**: Automated React application deployment pipeline
