@@ -234,7 +234,7 @@ module "web_hosting" {
   
   # S3 Configuration
   force_destroy_bucket       = var.force_destroy_web_bucket
-  customer_managed_key_arn   = var.customer_managed_key_arn
+  customer_managed_key_arn   = null  # Use AES256 encryption for CloudFront compatibility
   access_logging_bucket      = var.access_logging_bucket
   
   # CloudFront Configuration
