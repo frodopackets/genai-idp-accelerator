@@ -153,6 +153,18 @@ resource "aws_s3_bucket_versioning" "input" {
   }
 }
 
+resource "aws_s3_bucket_cors_configuration" "input" {
+  bucket = aws_s3_bucket.input.id
+
+  cors_rule {
+    allowed_headers = ["*"]
+    allowed_methods = ["GET", "PUT", "POST", "DELETE", "HEAD"]
+    allowed_origins = ["https://${module.pattern_2.website_domain}", "http://localhost:3000", "https://localhost:3000"]
+    expose_headers  = ["ETag", "x-amz-request-id"]
+    max_age_seconds = 3000
+  }
+}
+
 resource "aws_s3_bucket_logging" "input" {
   bucket = aws_s3_bucket.input.id
 
