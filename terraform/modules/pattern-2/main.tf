@@ -148,6 +148,114 @@ resource "aws_cloudwatch_log_group" "lambda_logs" {
 }
 
 # ----------------------------------------
+# Cognito Authentication Module
+# ----------------------------------------
+module "cognito" {
+  source = "./modules/cognito"
+  
+  resource_prefix = local.resource_prefix
+  
+  # Password Policy
+  password_policy = var.cognito_password_policy
+  
+  # MFA and Security
+  enable_mfa                = var.enable_mfa
+  admin_create_user_only    = var.admin_create_user_only
+  advanced_security_mode    = var.cognito_advanced_security_mode
+  
+  # User Pool Domain
+  user_pool_domain = var.cognito_user_pool_domain
+  
+  # OAuth Configuration
+  callback_urls = var.cognito_callback_urls
+  logout_urls   = var.cognito_logout_urls
+  
+  # Token Validity
+  token_validity = var.cognito_token_validity
+  
+  # Email Configuration
+  ses_email_identity   = var.ses_email_identity
+  reply_to_email      = var.reply_to_email
+  from_email_address  = var.from_email_address
+  
+  # Integration Configuration
+  appsync_api_arn = module.appsync.api_arn
+  s3_bucket_arns  = [
+    var.input_bucket_arn,
+    var.output_bucket_arn,
+    var.working_bucket_arn,
+    module.web_hosting.web_ui_bucket_arn
+  ]
+  
+  # Admin User
+  admin_user_email    = var.admin_user_email
+  admin_user_name     = var.admin_user_name
+  admin_temp_password = var.admin_temp_password
+  
+  tags = local.common_tags
+}
+
+# ----------------------------------------
+# AppSync GraphQL API Module
+# ----------------------------------------
+module "appsync" {
+  source = "./modules/appsync"
+  
+  resource_prefix = local.resource_prefix
+  
+  # Cognito Configuration
+  cognito_user_pool_id        = module.cognito.user_pool_id
+  cognito_user_pool_client_id = module.cognito.user_pool_client_id
+  
+  # DynamoDB Tables
+  tracking_table_name    = var.tracking_table
+  tracking_table_arn     = var.tracking_table_arn
+  configuration_table_name = var.configuration_table
+  configuration_table_arn  = var.configuration_table_arn
+  
+  # Lambda Resolvers
+  resolver_functions = local.ui_lambda_functions
+  lambda_resolvers   = local.lambda_resolvers
+  
+  # Configuration  
+  log_level       = var.log_level == "INFO" ? "ALL" : var.log_level == "DEBUG" ? "ALL" : "ERROR"
+  enable_api_key  = var.enable_appsync_api_key
+  
+  tags = local.common_tags
+}
+
+# ----------------------------------------
+# Web Hosting Module (CloudFront + S3)
+# ----------------------------------------
+module "web_hosting" {
+  source = "./modules/web-hosting"
+  
+  resource_prefix = local.resource_prefix
+  
+  # S3 Configuration
+  force_destroy_bucket       = var.force_destroy_web_bucket
+  customer_managed_key_arn   = var.customer_managed_key_arn
+  access_logging_bucket      = var.access_logging_bucket
+  
+  # CloudFront Configuration
+  cloudfront_price_class     = var.cloudfront_price_class
+  geo_restriction           = var.geo_restriction
+  custom_domain             = var.custom_domain
+  
+  # Application Configuration
+  app_name                  = var.app_name
+  cognito_user_pool_id      = module.cognito.user_pool_id
+  cognito_user_pool_client_id = module.cognito.user_pool_client_id
+  cognito_identity_pool_id  = module.cognito.identity_pool_id
+  appsync_graphql_endpoint  = module.appsync.graphql_url
+  
+  # Content Deployment
+  deploy_placeholder_content = var.deploy_placeholder_content
+  
+  tags = local.common_tags
+}
+
+# ----------------------------------------
 # Configuration Schema Update (handled by configuration module)
 # ----------------------------------------
 # Schema update is now handled by the configuration module

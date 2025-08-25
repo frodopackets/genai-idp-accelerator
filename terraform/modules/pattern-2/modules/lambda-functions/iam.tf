@@ -33,7 +33,7 @@ resource "aws_iam_role_policy" "ocr" {
 
 resource "aws_iam_role_policy_attachment" "ocr_xray" {
   role       = aws_iam_role.ocr.name
-  policy_arn = "arn:aws:iam::aws:policy/aws-service-role/AWSXRayDaemonWriteAccess"
+  policy_arn = "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess"
 }
 
 # VPC permissions for Lambda functions in VPC
@@ -67,7 +67,7 @@ resource "aws_iam_role_policy" "classification" {
 
 resource "aws_iam_role_policy_attachment" "classification_xray" {
   role       = aws_iam_role.classification.name
-  policy_arn = "arn:aws:iam::aws:policy/aws-service-role/AWSXRayDaemonWriteAccess"
+  policy_arn = "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess"
 }
 
 # VPC permissions for Lambda functions in VPC
@@ -101,7 +101,7 @@ resource "aws_iam_role_policy" "extraction" {
 
 resource "aws_iam_role_policy_attachment" "extraction_xray" {
   role       = aws_iam_role.extraction.name
-  policy_arn = "arn:aws:iam::aws:policy/aws-service-role/AWSXRayDaemonWriteAccess"
+  policy_arn = "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess"
 }
 
 # VPC permissions for Lambda functions in VPC
@@ -135,7 +135,7 @@ resource "aws_iam_role_policy" "assessment" {
 
 resource "aws_iam_role_policy_attachment" "assessment_xray" {
   role       = aws_iam_role.assessment.name
-  policy_arn = "arn:aws:iam::aws:policy/aws-service-role/AWSXRayDaemonWriteAccess"
+  policy_arn = "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess"
 }
 
 # VPC permissions for Lambda functions in VPC
@@ -169,7 +169,7 @@ resource "aws_iam_role_policy" "summarization" {
 
 resource "aws_iam_role_policy_attachment" "summarization_xray" {
   role       = aws_iam_role.summarization.name
-  policy_arn = "arn:aws:iam::aws:policy/aws-service-role/AWSXRayDaemonWriteAccess"
+  policy_arn = "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess"
 }
 
 # VPC permissions for Lambda functions in VPC
@@ -203,7 +203,7 @@ resource "aws_iam_role_policy" "process_results" {
 
 resource "aws_iam_role_policy_attachment" "process_results_xray" {
   role       = aws_iam_role.process_results.name
-  policy_arn = "arn:aws:iam::aws:policy/aws-service-role/AWSXRayDaemonWriteAccess"
+  policy_arn = "arn:aws:iam::aws:policy/AWSXRayDaemonWriteAccess"
 }
 
 # VPC permissions for Lambda functions in VPC

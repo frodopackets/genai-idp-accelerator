@@ -668,6 +668,13 @@ module "pattern_2" {
   configuration_table          = aws_dynamodb_table.configuration.name
   customer_managed_key_arn     = aws_kms_key.idp.arn
   
+  # S3 Bucket ARNs for UI integration
+  input_bucket_arn             = aws_s3_bucket.input.arn
+  output_bucket_arn            = aws_s3_bucket.output.arn
+  working_bucket_arn           = aws_s3_bucket.working.arn
+  tracking_table_arn           = aws_dynamodb_table.tracking.arn
+  configuration_table_arn      = aws_dynamodb_table.configuration.arn
+  
   # Optional features
   is_summarization_enabled     = var.enable_summarization
   is_assessment_enabled        = var.enable_assessment
@@ -678,6 +685,36 @@ module "pattern_2" {
   
   # Environment
   environment                 = var.environment
+  
+  # UI Configuration
+  app_name                    = "IDP Pattern 2 - ${var.environment}"
+  admin_user_email           = var.admin_user_email
+  admin_user_name            = var.admin_user_name
+  admin_temp_password        = var.admin_temp_password
+  
+  # Update callback URLs with CloudFront domain (will be set after deployment)
+  cognito_callback_urls      = var.enable_custom_domain && var.custom_domain != null ? [
+    "https://${var.custom_domain}/",
+    "https://${var.custom_domain}/auth/"
+  ] : [
+    "http://localhost:3000/",
+    "https://localhost:3000/"
+  ]
+  
+  cognito_logout_urls        = var.enable_custom_domain && var.custom_domain != null ? [
+    "https://${var.custom_domain}/",
+    "https://${var.custom_domain}/auth/"
+  ] : [
+    "http://localhost:3000/",
+    "https://localhost:3000/"
+  ]
+  
+  # Custom domain configuration
+  custom_domain = var.enable_custom_domain && var.custom_domain != null && var.certificate_arn != null ? {
+    domain_name      = var.custom_domain
+    certificate_arn  = var.certificate_arn
+    hosted_zone_id   = var.hosted_zone_id
+  } : null
   
   tags = local.tags
 }

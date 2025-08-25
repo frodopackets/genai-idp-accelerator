@@ -1,0 +1,19 @@
+{
+    "version": "2017-02-28",
+    "operation": "UpdateItem",
+    "key": {
+        "PK": {"S": "$ctx.args.input.ObjectKey"},
+        "SK": {"S": "DOCUMENT"}
+    },
+    "update": {
+        "expression": "SET #objStatus = :objStatus, #workflowStatus = :workflowStatus",
+        "expressionNames": {
+            "#objStatus": "ObjectStatus",
+            "#workflowStatus": "WorkflowStatus"
+        },
+        "expressionValues": {
+            ":objStatus": {"S": "$ctx.args.input.ObjectStatus"},
+            ":workflowStatus": {"S": "$ctx.args.input.WorkflowStatus"}
+        }
+    }
+}

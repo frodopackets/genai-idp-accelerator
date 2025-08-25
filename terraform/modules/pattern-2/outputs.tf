@@ -105,3 +105,102 @@ output "integration_endpoints" {
     configuration_table  = var.configuration_table
   }
 }
+
+# ========================================
+# UI Infrastructure Outputs
+# ========================================
+
+# Cognito Outputs
+output "cognito_user_pool_id" {
+  description = "Cognito User Pool ID"
+  value       = module.cognito.user_pool_id
+}
+
+output "cognito_user_pool_client_id" {
+  description = "Cognito User Pool Client ID"
+  value       = module.cognito.user_pool_client_id
+}
+
+output "cognito_identity_pool_id" {
+  description = "Cognito Identity Pool ID"
+  value       = module.cognito.identity_pool_id
+}
+
+output "cognito_user_pool_domain" {
+  description = "Cognito User Pool domain"
+  value       = module.cognito.user_pool_domain
+}
+
+# AppSync Outputs
+output "appsync_api_id" {
+  description = "AppSync API ID"
+  value       = module.appsync.api_id
+}
+
+output "appsync_graphql_url" {
+  description = "AppSync GraphQL endpoint URL"
+  value       = module.appsync.graphql_url
+}
+
+output "appsync_api_key" {
+  description = "AppSync API Key (if enabled)"
+  value       = module.appsync.api_key
+  sensitive   = true
+}
+
+# Web Hosting Outputs
+output "website_url" {
+  description = "Website URL"
+  value       = module.web_hosting.website_url
+}
+
+output "web_ui_bucket_name" {
+  description = "S3 bucket name for web UI"
+  value       = module.web_hosting.web_ui_bucket_name
+}
+
+output "cloudfront_distribution_id" {
+  description = "CloudFront distribution ID"
+  value       = module.web_hosting.cloudfront_distribution_id
+}
+
+output "cloudfront_domain_name" {
+  description = "CloudFront distribution domain name"
+  value       = module.web_hosting.cloudfront_domain_name
+}
+
+# UI Configuration Summary
+output "ui_configuration" {
+  description = "Complete UI configuration for React app"
+  value = {
+    aws_region              = data.aws_region.current.name
+    cognito_region          = data.aws_region.current.name
+    user_pool_id           = module.cognito.user_pool_id
+    user_pool_client_id    = module.cognito.user_pool_client_id
+    identity_pool_id       = module.cognito.identity_pool_id
+    graphql_endpoint       = module.appsync.graphql_url
+    website_url            = module.web_hosting.website_url
+    web_ui_bucket         = module.web_hosting.web_ui_bucket_name
+    cloudfront_domain     = module.web_hosting.cloudfront_domain_name
+  }
+}
+
+# Deployment Instructions
+output "deployment_instructions" {
+  description = "Instructions for completing the UI deployment"
+  value = {
+    backend_status = "✅ Backend infrastructure deployed successfully"
+    frontend_status = "❌ React application requires separate build and deployment"
+    next_steps = [
+      "1. Build the React application from /src/ui/ directory",
+      "2. Configure React app with the UI configuration values above",
+      "3. Deploy built assets to S3 bucket: ${module.web_hosting.web_ui_bucket_name}",
+      "4. Invalidate CloudFront cache: ${module.web_hosting.cloudfront_distribution_id}",
+      "5. Access the application at: ${module.web_hosting.website_url}"
+    ]
+    ui_config_file = "Save the ui_configuration output to a .env file for React app"
+  }
+}
+
+# Data Sources
+data "aws_region" "current" {}

@@ -54,3 +54,50 @@ variable "replication_destination_region" {
   type        = string
   default     = "us-west-2"
 }
+
+# ========================================
+# UI Infrastructure Variables
+# ========================================
+
+variable "admin_user_email" {
+  description = "Admin user email address for Cognito (optional)"
+  type        = string
+  default     = null
+}
+
+variable "admin_user_name" {
+  description = "Admin user name for Cognito (optional)"
+  type        = string
+  default     = "Administrator"
+}
+
+variable "admin_temp_password" {
+  description = "Admin user temporary password"
+  type        = string
+  default     = null
+  sensitive   = true
+}
+
+variable "enable_custom_domain" {
+  description = "Enable custom domain for web UI"
+  type        = bool
+  default     = false
+}
+
+variable "custom_domain" {
+  description = "Custom domain name for web UI (e.g., idp.example.com)"
+  type        = string
+  default     = null
+}
+
+variable "certificate_arn" {
+  description = "ACM certificate ARN for custom domain (must be in us-east-1 for CloudFront)"
+  type        = string
+  default     = null
+}
+
+variable "hosted_zone_id" {
+  description = "Route53 hosted zone ID for custom domain"
+  type        = string
+  default     = null
+}

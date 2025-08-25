@@ -243,3 +243,213 @@ variable "environment" {
     error_message = "Environment must be one of: dev, test, staging, prod."
   }
 }
+
+# ========================================
+# UI Infrastructure Variables
+# ========================================
+
+# Cognito Authentication Variables
+variable "cognito_password_policy" {
+  description = "Cognito password policy configuration"
+  type = object({
+    minimum_length              = number
+    require_lowercase           = bool
+    require_numbers            = bool
+    require_symbols            = bool
+    require_uppercase          = bool
+    temp_password_validity_days = number
+  })
+  default = {
+    minimum_length              = 8
+    require_lowercase           = true
+    require_numbers            = true
+    require_symbols            = true
+    require_uppercase          = true
+    temp_password_validity_days = 7
+  }
+}
+
+variable "enable_mfa" {
+  description = "Enable multi-factor authentication for Cognito"
+  type        = bool
+  default     = false
+}
+
+variable "admin_create_user_only" {
+  description = "Only allow administrators to create users"
+  type        = bool
+  default     = true
+}
+
+variable "cognito_advanced_security_mode" {
+  description = "Cognito advanced security mode (OFF, AUDIT, ENFORCED)"
+  type        = string
+  default     = "OFF"
+  validation {
+    condition     = contains(["OFF", "AUDIT", "ENFORCED"], var.cognito_advanced_security_mode)
+    error_message = "Advanced security mode must be OFF, AUDIT, or ENFORCED."
+  }
+}
+
+variable "cognito_user_pool_domain" {
+  description = "Domain name for the Cognito user pool"
+  type        = string
+  default     = null
+}
+
+variable "cognito_callback_urls" {
+  description = "List of allowed callback URLs for Cognito client"
+  type        = list(string)
+  default     = ["http://localhost:3000/", "https://localhost:3000/"]
+}
+
+variable "cognito_logout_urls" {
+  description = "List of allowed logout URLs for Cognito client"
+  type        = list(string)
+  default     = ["http://localhost:3000/", "https://localhost:3000/"]
+}
+
+variable "cognito_token_validity" {
+  description = "Token validity periods for Cognito"
+  type = object({
+    access_token_hours   = number
+    id_token_hours       = number
+    refresh_token_days   = number
+  })
+  default = {
+    access_token_hours   = 1
+    id_token_hours       = 1
+    refresh_token_days   = 30
+  }
+}
+
+# Email Configuration
+variable "ses_email_identity" {
+  description = "SES verified email identity for sending emails"
+  type        = string
+  default     = null
+}
+
+variable "reply_to_email" {
+  description = "Reply-to email address for Cognito emails"
+  type        = string
+  default     = null
+}
+
+variable "from_email_address" {
+  description = "From email address for Cognito emails"
+  type        = string
+  default     = null
+}
+
+# Admin User Configuration
+variable "admin_user_email" {
+  description = "Admin user email address (optional)"
+  type        = string
+  default     = null
+}
+
+variable "admin_user_name" {
+  description = "Admin user name (optional)"
+  type        = string
+  default     = null
+}
+
+variable "admin_temp_password" {
+  description = "Admin user temporary password"
+  type        = string
+  default     = null
+  sensitive   = true
+}
+
+# AppSync Configuration
+variable "enable_appsync_api_key" {
+  description = "Enable AppSync API key for development/testing"
+  type        = bool
+  default     = false
+}
+
+# Web Hosting Configuration
+variable "app_name" {
+  description = "Application name for web UI"
+  type        = string
+  default     = "IDP Pattern 2"
+}
+
+variable "force_destroy_web_bucket" {
+  description = "Force destroy web UI S3 bucket on deletion"
+  type        = bool
+  default     = false
+}
+
+variable "access_logging_bucket" {
+  description = "S3 bucket for access logging"
+  type        = string
+  default     = null
+}
+
+variable "cloudfront_price_class" {
+  description = "CloudFront price class"
+  type        = string
+  default     = "PriceClass_100"
+  validation {
+    condition     = contains(["PriceClass_All", "PriceClass_200", "PriceClass_100"], var.cloudfront_price_class)
+    error_message = "CloudFront price class must be PriceClass_All, PriceClass_200, or PriceClass_100."
+  }
+}
+
+variable "geo_restriction" {
+  description = "Geographic restriction configuration for CloudFront"
+  type = object({
+    type      = string
+    locations = list(string)
+  })
+  default = null
+}
+
+variable "custom_domain" {
+  description = "Custom domain configuration for web UI"
+  type = object({
+    domain_name      = string
+    certificate_arn  = string
+    hosted_zone_id   = string
+  })
+  default = null
+}
+
+variable "deploy_placeholder_content" {
+  description = "Deploy placeholder HTML content to web UI bucket"
+  type        = bool
+  default     = true
+}
+
+# S3 Bucket ARNs (for Cognito IAM policies)
+variable "input_bucket_arn" {
+  description = "Input S3 bucket ARN"
+  type        = string
+  default     = ""
+}
+
+variable "output_bucket_arn" {
+  description = "Output S3 bucket ARN"
+  type        = string
+  default     = ""
+}
+
+variable "working_bucket_arn" {
+  description = "Working S3 bucket ARN"
+  type        = string
+  default     = ""
+}
+
+variable "tracking_table_arn" {
+  description = "Tracking DynamoDB table ARN"
+  type        = string
+  default     = ""
+}
+
+variable "configuration_table_arn" {
+  description = "Configuration DynamoDB table ARN"
+  type        = string
+  default     = ""
+}

@@ -199,4 +199,21 @@ locals {
       }
     }
   }
+  
+  # ========================================
+  # UI Infrastructure Local Values
+  # ========================================
+  
+  # UI Lambda functions for GraphQL resolvers (placeholder - would need actual functions)
+  ui_lambda_functions = {
+    # These would be the actual UI resolver Lambda functions
+    # For now, we'll use empty map as they need to be created separately
+  }
+  
+  # Lambda resolver configurations for AppSync
+  lambda_resolvers = {
+    # Configuration for Lambda-backed GraphQL resolvers
+    # These would map resolver names to their field and type configurations
+    # For now, empty as basic resolvers use VTL templates
+  }
 }

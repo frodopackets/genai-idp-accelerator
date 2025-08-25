@@ -17,3 +17,17 @@ __pycache__
 .ruff_cache
 .kiro
 rvl_cdip_*
+
+# Terraform providers (too large for git)
+.terraform/
+
+# Python virtual environments
+checkov-venv/
+*.venv/
+venv/
+env/
+
+# Terraform state and providers (too large for git)
+terraform.tfstate*
+tfplan*
+*.terraform.lock.hcl

@@ -1,0 +1,28 @@
+{
+  "mcpServers": {
+    "bedrock-data-automation-mcp-server": {
+      "command": "uvx",
+      "args": ["awslabs.aws-bedrock-data-automation-mcp-server@latest"],
+      "env": {
+        "AWS_PROFILE": "default",
+        "AWS_REGION": "us-east-1",
+        "AWS_BUCKET_NAME": "bedrock-data-automation-723648924038-us-east-1",
+        "BASE_DIR": "/home/robww/accelerated-intelligent-document-processing-on-aws",
+        "FASTMCP_LOG_LEVEL": "ERROR"
+      },
+      "disabled": false,
+      "autoApprove": []
+    },
+    "awslabs.aws-pricing-mcp-server": {
+      "command": "uvx",
+      "args": ["awslabs.aws-pricing-mcp-server@latest"],
+      "env": {
+        "FASTMCP_LOG_LEVEL": "ERROR",
+        "AWS_PROFILE": "default",
+        "AWS_REGION": "us-east-1"
+      },
+      "disabled": false,
+      "autoApprove": []
+    }
+  }
+}

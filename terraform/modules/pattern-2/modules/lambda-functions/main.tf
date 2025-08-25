@@ -37,7 +37,7 @@ resource "aws_lambda_function" "ocr" {
   filename         = "${path.module}/functions/ocr/deployment.zip"
   function_name    = var.lambda_function_names["ocr"]
   role            = aws_iam_role.ocr.arn
-  handler         = "lambda_function.lambda_handler"
+  handler         = "lambda_function.handler"
   runtime         = var.lambda_runtime
   timeout         = var.lambda_timeout
   memory_size     = var.lambda_memory_size
@@ -91,7 +91,7 @@ resource "aws_lambda_function" "classification" {
   filename         = "${path.module}/functions/classification/deployment.zip"
   function_name    = var.lambda_function_names["classification"]
   role            = aws_iam_role.classification.arn
-  handler         = "lambda_function.lambda_handler"
+  handler         = "lambda_function.handler"
   runtime         = var.lambda_runtime
   timeout         = var.lambda_timeout
   memory_size     = var.lambda_memory_size
@@ -145,7 +145,7 @@ resource "aws_lambda_function" "extraction" {
   filename         = "${path.module}/functions/extraction/deployment.zip"
   function_name    = var.lambda_function_names["extraction"]
   role            = aws_iam_role.extraction.arn
-  handler         = "lambda_function.lambda_handler"
+  handler         = "lambda_function.handler"
   runtime         = var.lambda_runtime
   timeout         = var.lambda_timeout
   memory_size     = var.lambda_memory_size
@@ -199,7 +199,7 @@ resource "aws_lambda_function" "assessment" {
   filename         = "${path.module}/functions/assessment/deployment.zip"
   function_name    = var.lambda_function_names["assessment"]
   role            = aws_iam_role.assessment.arn
-  handler         = "lambda_function.lambda_handler"
+  handler         = "lambda_function.handler"
   runtime         = var.lambda_runtime
   timeout         = var.lambda_timeout
   memory_size     = var.lambda_memory_size
@@ -254,7 +254,7 @@ resource "aws_lambda_function" "summarization" {
   filename         = "${path.module}/functions/summarization/deployment.zip"
   function_name    = var.lambda_function_names["summarization"]
   role            = aws_iam_role.summarization.arn
-  handler         = "lambda_function.lambda_handler"
+  handler         = "lambda_function.handler"
   runtime         = var.lambda_runtime
   timeout         = var.lambda_timeout
   memory_size     = var.lambda_memory_size
@@ -309,7 +309,7 @@ resource "aws_lambda_function" "process_results" {
   filename         = "${path.module}/functions/process_results/deployment.zip"
   function_name    = var.lambda_function_names["process_results"]
   role            = aws_iam_role.process_results.arn
-  handler         = "lambda_function.lambda_handler"
+  handler         = "lambda_function.handler"
   runtime         = var.lambda_runtime
   timeout         = 60
   memory_size     = 1024
