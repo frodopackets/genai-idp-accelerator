@@ -1,0 +1,15 @@
+{
+    "version": "2017-02-28",
+    "operation": "PutItem",
+    "key": {
+        "PK": {"S": "$ctx.args.input.ObjectKey"},
+        "SK": {"S": "DOCUMENT"}
+    },
+    "attributeValues": {
+        "ObjectKey": {"S": "$ctx.args.input.ObjectKey"},
+        "ObjectStatus": {"S": "$ctx.args.input.ObjectStatus"},
+        "InitialEventTime": {"S": "$ctx.args.input.InitialEventTime"},
+        "QueuedTime": {"S": "$ctx.args.input.QueuedTime"},
+        "ExpiresAfter": {"N": "$ctx.args.input.ExpiresAfter"}
+    }
+}

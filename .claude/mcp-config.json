@@ -1,0 +1,30 @@
+{
+  "mcpServers": {
+    "aws-pricing": {
+      "command": "uv",
+      "args": [
+        "tool",
+        "run",
+        "mcp-server-aws-pricing"
+      ],
+      "env": {
+        "AWS_PROFILE": "${AWS_PROFILE:-default}",
+        "AWS_REGION": "${AWS_REGION:-us-east-1}"
+      }
+    },
+    "aws-bedrock-data-automation": {
+      "command": "python",
+      "args": [
+        "-m",
+        "awslabs_aws_bedrock_data_automation_mcp_server"
+      ],
+      "env": {
+        "AWS_PROFILE": "${AWS_PROFILE:-default}",
+        "AWS_REGION": "${AWS_REGION:-us-east-1}",
+        "AWS_BUCKET_NAME": "${AWS_BUCKET_NAME}",
+        "BASE_DIR": "${BASE_DIR:-/home/robww/accelerated-intelligent-document-processing-on-aws}",
+        "FASTMCP_LOG_LEVEL": "${FASTMCP_LOG_LEVEL:-ERROR}"
+      }
+    }
+  }
+}
